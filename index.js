@@ -21,9 +21,32 @@ async function connectDB() {
 
 connectDB();
 
+// Creating a Schema
+const productSchema = new mongoose.Schema({
+    product_name : {
+        type : String,
+        required : true
+    },
+
+    product_price : {
+        type : String,
+        required : true 
+    },
+
+    isInStock : {
+        type : Boolean,
+        required : true
+    },
+
+    category : {
+        type : String,
+        required : true
+    }
+})
+
 // Define a simple route
 app.get('/', (req, res) => {
-  res.send('Hello, MongoDB Connected!');
+  res.send('<h1>Hello, MongoDB Connected!</h1>');
 });
 
 // Start the server
