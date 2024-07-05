@@ -1,57 +1,63 @@
-// connecting MongoDB
-const express = require('express');
-const mongoose = require('mongoose');
-
+const express = require("express");
+const mongoose = require("mongoose");
 const app = express();
 
-// Middleware to parse JSON bodies
 app.use(express.json());
 
-const mongoURI = 'mongodb+srv://harshitshah1605:4311@harshitdb.wtprwst.mongodb.net/?retryWrites=true&w=majority&appName=harshitDB';
+mongoose
+  .connect(
+    "mongodb+srv://harshitshah1605:4311@harshitdb.wtprwst.mongodb.net/?retryWrites=true&w=majority&appName=harshitDB"
+  )
+  .then(() => {
+    console.log("MongoDb Connected");
+  })
+  .catch((err) => {
+    console.log("Failed", err);
+  });
 
-async function connectDB() {
-  try {
-    await mongoose.connect(mongoURI);
-    console.log('MongoDB connected');
-  } 
-  catch (err) {
-    console.error('MongoDB connection failed:', err);
-  }
-}
-
-connectDB();
-
-// Creating a Schema
+// ProductSchema
 const productSchema = new mongoose.Schema({
-    product_name : {
-        type : String,
-        required : true
-    },
+  product_name: {
+    type: String,
+    required: true,
+  },
+  product_price: {
+    type: String,
+    required: true,
+  },
+  isInStock: {
+    type: Boolean,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+});
 
-    product_price : {
-        type : String,
-        required : true 
-    },
+const productModel = mongoose.model("products", productSchema);
 
-    isInStock : {
-        type : Boolean,
-        required : true
-    },
-
-    category : {
-        type : String,
-        required : true
+// Create
+// Create
+app.post("/api/products", async (req, res) => {
+    try {
+      const product = await productModel.create({
+        product_name: req.body.product_name,
+        product_price: req.body.product_price,
+        isInStock: req.body.isInStock,
+        category: req.body.category,
+      });
+  
+      console.log(product);
+  
+      return res.status(201).json({ message: "Product Created", product });
+    } 
+    catch (error) {
+      console.error("Error creating product:", error);
+      return res.status(500).json({ error: "Failed to create product" });
     }
-})
+  });
 
-// Define a simple route
-app.get('/', (req, res) => {
-  res.send('<h1>Hello, MongoDB Connected!</h1>');
+app.listen(3000, () => {
+  console.log("Server sarted at port 3000");
 });
-
-// Start the server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
